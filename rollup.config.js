@@ -1,5 +1,6 @@
 /**
- * Rollup 打包配置
+ * Rollup 打包配置（优化版）
+ * 支持代码分割、Tree-shaking、压缩优化
  */
 
 import resolve from '@rollup/plugin-node-resolve';
@@ -9,8 +10,11 @@ import babel from '@rollup/plugin-babel';
 import postcss from 'rollup-plugin-postcss';
 import { terser } from 'rollup-plugin-terser';
 import vue from 'rollup-plugin-vue';
+import analyze from 'rollup-plugin-analyzer';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 const production = !process.env.ROLLUP_WATCH;
+const analyze_bundle = process.env.ANALYZE === 'true';
 
 // 通用插件配置
 const commonPlugins = [
@@ -27,30 +31,56 @@ const commonPlugins = [
   }),
 ];
 
-// 核心包配置（不包含框架组件）
+// 核心包配置（优化版）
 const coreConfig = {
-  input: 'src/index.ts',
+  input: {
+    index: 'src/index.ts',
+    // 代码分割：将模块分离
+    'modules/parser': 'src/modules/parser.ts',
+    'modules/viewer': 'src/modules/viewer.ts',
+    'modules/editor': 'src/modules/editor.ts',
+    'modules/exporter': 'src/modules/exporter.ts',
+    'modules/table': 'src/modules/table.ts',
+    'modules/comment': 'src/modules/comment.ts',
+    'modules/revision': 'src/modules/revision.ts',
+    'modules/collaboration': 'src/modules/collaboration.ts',
+    'utils/logger': 'src/utils/logger.ts',
+    'utils/memory': 'src/utils/memory.ts',
+  },
   output: [
     {
-      file: 'dist/index.esm.js',
+      dir: 'dist',
       format: 'es',
-      sourcemap: true,
+      sourcemap: production,
+      chunkFileNames: 'chunks/[name]-[hash].js',
+      entryFileNames: '[name].js',
+      // 保留模块结构以支持 tree-shaking
+      preserveModules: false,
+      // 代码分割策略
+      manualChunks: {
+        'vendor-docx': ['docx-preview', 'mammoth'],
+        'vendor-utils': ['jszip'],
+      },
     },
     {
       file: 'dist/index.cjs.js',
       format: 'cjs',
-      sourcemap: true,
+      sourcemap: production,
       exports: 'named',
     },
     {
       file: 'dist/index.umd.js',
       format: 'umd',
       name: 'WordViewer',
-      sourcemap: true,
-      globals: {},
+      sourcemap: production,
+      globals: {
+        'docx-preview': 'DocxPreview',
+        'mammoth': 'mammoth',
+        'jszip': 'JSZip',
+      },
     },
   ],
-  external: ['docx-preview', 'mammoth', 'docx', 'jszip'],
+  external: ['docx-preview', 'mammoth', 'docx', 'jszip', 'jspdf', 'html2canvas'],
   plugins: [
     ...commonPlugins,
     typescript({
@@ -58,10 +88,41 @@ const coreConfig = {
       declaration: true,
       declarationDir: 'dist',
       rootDir: 'src',
-      exclude: ['**/*.vue', 'src/components/**/*'],
+      exclude: ['**/*.vue', 'src/components/**/*', '**/*.test.ts', '**/*.spec.ts'],
     }),
-    production && terser(),
+    production && terser({
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.debug'],
+      },
+      mangle: {
+        properties: {
+          regex: /^_/,
+        },
+      },
+      format: {
+        comments: false,
+      },
+    }),
+    analyze_bundle && analyze({
+      summaryOnly: true,
+      limit: 10,
+    }),
+    analyze_bundle && visualizer({
+      filename: 'dist/stats.html',
+      open: false,
+      gzipSize: true,
+      brotliSize: true,
+    }),
   ].filter(Boolean),
+  
+  // Tree-shaking 优化
+  treeshake: {
+    moduleSideEffects: false,
+    propertyReadSideEffects: false,
+    tryCatchDeoptimization: false,
+  },
 };
 
 // Vue 组件配置

@@ -1,9 +1,23 @@
 /**
  * 文档编辑模块
+ * 使用现代 API 替代已废弃的 execCommand
  */
 
 import { TextFormat, InsertImageOptions, EditState, SelectionRange } from '../core/types';
 import type { WordViewer } from '../core/WordViewer';
+import {
+  insertText as insertTextModern,
+  insertHTML,
+  applyFormat as applyFormatModern,
+  setAlignment,
+  createLink,
+  insertList,
+  getSelectionInfo,
+} from '../utils/selection';
+import { onPaste, copySelection, cutSelection } from '../utils/clipboard';
+import { Logger } from '../utils/logger';
+
+const logger = new Logger({ prefix: '[Editor]' });
 
 export class EditorModule {
   private viewer: WordViewer;
@@ -12,6 +26,7 @@ export class EditorModule {
   private undoStack: string[] = [];
   private redoStack: string[] = [];
   private maxUndoSize: number = 50;
+  private cleanupPaste?: () => void;
 
   constructor(viewer: WordViewer) {
     this.viewer = viewer;
@@ -25,18 +40,21 @@ export class EditorModule {
 
     const container = this.viewer.getContainer();
     const contentElement = container.querySelector('.viewer-content');
-    
+
     if (contentElement) {
       contentElement.setAttribute('contenteditable', 'true');
       contentElement.classList.add('editable');
-      
+
       // 监听内容变化
       contentElement.addEventListener('input', this.handleInput.bind(this));
-      contentElement.addEventListener('paste', this.handlePaste.bind(this));
+
+      // 使用现代 Clipboard API 处理粘贴
+      this.cleanupPaste = onPaste(contentElement as HTMLElement, this.handlePasteModern.bind(this));
     }
 
     this.isEnabled = true;
     this.saveState();
+    logger.info('编辑模式已启用');
   }
 
   /**
@@ -47,13 +65,20 @@ export class EditorModule {
 
     const container = this.viewer.getContainer();
     const contentElement = container.querySelector('.viewer-content');
-    
+
     if (contentElement) {
       contentElement.setAttribute('contenteditable', 'false');
       contentElement.classList.remove('editable');
     }
 
+    // 清理粘贴事件监听
+    if (this.cleanupPaste) {
+      this.cleanupPaste();
+      this.cleanupPaste = undefined;
+    }
+
     this.isEnabled = false;
+    logger.info('编辑模式已禁用');
   }
 
   /**
@@ -65,40 +90,73 @@ export class EditorModule {
   }
 
   /**
-   * 处理粘贴事件
+   * 处理粘贴事件（使用现代 API）
    */
-  private handlePaste(event: Event): void {
-    const clipboardEvent = event as ClipboardEvent;
-    event.preventDefault();
+  private handlePasteModern(data: { text?: string; html?: string; files?: File[] }): void {
+    logger.debug('处理粘贴', { hasText: !!data.text, hasHtml: !!data.html, hasFiles: !!data.files });
 
-    const text = clipboardEvent.clipboardData?.getData('text/plain');
-    if (text) {
-      document.execCommand('insertText', false, text);
+    // 优先使用 HTML（保留格式）
+    if (data.html) {
+      // 清理可能的危险 HTML
+      const cleanHtml = this.sanitizeHTML(data.html);
+      insertHTML(cleanHtml);
+    } else if (data.text) {
+      // 降级到纯文本
+      insertTextModern(data.text);
     }
-  }
 
-  /**
-   * 插入文本
-   */
-  insertText(text: string, position?: number): void {
-    this.ensureEnabled();
-
-    if (position !== undefined) {
-      // 在指定位置插入
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        range.deleteContents();
-        range.insertNode(document.createTextNode(text));
-        range.collapse(false);
-      }
-    } else {
-      // 在光标位置插入
-      document.execCommand('insertText', false, text);
+    // 处理文件（图片）
+    if (data.files && data.files.length > 0) {
+      data.files.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          this.insertImage(file);
+        }
+      });
     }
 
     this.isDirty = true;
     this.saveState();
+  }
+
+  /**
+   * 清理 HTML（防止 XSS）
+   */
+  private sanitizeHTML(html: string): string {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+
+    // 移除脚本标签
+    const scripts = div.querySelectorAll('script');
+    scripts.forEach(script => script.remove());
+
+    // 移除事件处理器
+    const all = div.querySelectorAll('*');
+    all.forEach(element => {
+      Array.from(element.attributes).forEach(attr => {
+        if (attr.name.startsWith('on')) {
+          element.removeAttribute(attr.name);
+        }
+      });
+    });
+
+    return div.innerHTML;
+  }
+
+  /**
+   * 插入文本（使用现代 API）
+   */
+  insertText(text: string, position?: number): void {
+    this.ensureEnabled();
+
+    try {
+      insertTextModern(text);
+      this.isDirty = true;
+      this.saveState();
+      logger.debug('插入文本', { length: text.length });
+    } catch (error) {
+      logger.error('插入文本失败', error);
+      throw error;
+    }
   }
 
   /**
@@ -111,7 +169,7 @@ export class EditorModule {
     reader.onload = (e) => {
       const img = document.createElement('img');
       img.src = e.target?.result as string;
-      
+
       if (options?.width) {
         img.width = options.width;
       }
@@ -121,8 +179,8 @@ export class EditorModule {
       if (options?.alignment) {
         img.style.display = 'block';
         img.style.marginLeft = options.alignment === 'center' ? 'auto' : '0';
-        img.style.marginRight = options.alignment === 'center' ? 'auto' : 
-                               options.alignment === 'right' ? '0' : 'auto';
+        img.style.marginRight = options.alignment === 'center' ? 'auto' :
+          options.alignment === 'right' ? '0' : 'auto';
       }
 
       const selection = window.getSelection();
@@ -140,66 +198,118 @@ export class EditorModule {
   }
 
   /**
-   * 应用文本格式
+   * 应用文本格式（使用现代 API）
    */
   applyFormat(format: TextFormat): void {
     this.ensureEnabled();
 
-    if (format.bold !== undefined) {
-      document.execCommand('bold', false);
-    }
-    if (format.italic !== undefined) {
-      document.execCommand('italic', false);
-    }
-    if (format.underline !== undefined) {
-      document.execCommand('underline', false);
-    }
-    if (format.strikethrough !== undefined) {
-      document.execCommand('strikeThrough', false);
-    }
-    if (format.fontSize) {
-      // execCommand 的 fontSize 使用 1-7 的数值
-      const size = Math.min(7, Math.max(1, Math.round(format.fontSize / 4)));
-      document.execCommand('fontSize', false, size.toString());
-    }
-    if (format.fontFamily) {
-      document.execCommand('fontName', false, format.fontFamily);
-    }
-    if (format.color) {
-      document.execCommand('foreColor', false, format.color);
-    }
-    if (format.backgroundColor) {
-      document.execCommand('backColor', false, format.backgroundColor);
-    }
-    if (format.alignment) {
-      const alignCommands = {
-        left: 'justifyLeft',
-        center: 'justifyCenter',
-        right: 'justifyRight',
-        justify: 'justifyFull',
-      };
-      document.execCommand(alignCommands[format.alignment], false);
-    }
+    try {
+      // 使用现代 Selection API
+      applyFormatModern({
+        bold: format.bold,
+        italic: format.italic,
+        underline: format.underline,
+        strikethrough: format.strikethrough,
+        fontSize: format.fontSize,
+        fontFamily: format.fontFamily,
+        color: format.color,
+        backgroundColor: format.backgroundColor,
+      });
 
-    this.isDirty = true;
-    this.saveState();
+      // 处理对齐
+      if (format.alignment) {
+        setAlignment(format.alignment);
+      }
+
+      this.isDirty = true;
+      this.saveState();
+      logger.debug('应用格式', format);
+    } catch (error) {
+      logger.error('应用格式失败', error);
+      throw error;
+    }
   }
 
   /**
-   * 获取选中文本
+   * 获取选中文本（使用现代 API）
    */
   getSelection(): SelectionRange | null {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) {
+    const info = getSelectionInfo();
+    if (!info) {
       return null;
     }
 
-    const range = selection.getRangeAt(0);
     return {
-      start: range.startOffset,
-      end: range.endOffset,
-      text: selection.toString(),
+      start: info.startOffset,
+      end: info.endOffset,
+      text: info.text,
     };
+  }
+
+  /**
+   * 复制选中内容
+   */
+  async copy(): Promise<void> {
+    this.ensureEnabled();
+
+    try {
+      await copySelection();
+      logger.info('已复制选中内容');
+    } catch (error) {
+      logger.error('复制失败', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 剪切选中内容
+   */
+  async cut(): Promise<void> {
+    this.ensureEnabled();
+
+    try {
+      await cutSelection();
+      this.isDirty = true;
+      this.saveState();
+      logger.info('已剪切选中内容');
+    } catch (error) {
+      logger.error('剪切失败', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 创建链接
+   */
+  createLink(url: string, text?: string): void {
+    this.ensureEnabled();
+
+    try {
+      createLink(url, text);
+      this.isDirty = true;
+      this.saveState();
+      logger.debug('创建链接', { url });
+    } catch (error) {
+      logger.error('创建链接失败', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 插入列表
+   */
+  insertList(type: 'ul' | 'ol'): void {
+    this.ensureEnabled();
+
+    try {
+      insertList(type);
+      this.isDirty = true;
+      this.saveState();
+      logger.debug('插入列表', { type });
+    } catch (error) {
+      logger.error('插入列表失败', error);
+      throw error;
+    }
   }
 
   /**
@@ -235,19 +345,19 @@ export class EditorModule {
   private saveState(): void {
     const container = this.viewer.getContainer();
     const contentElement = container.querySelector('.viewer-content');
-    
+
     if (contentElement) {
       const state = contentElement.innerHTML;
-      
+
       // 避免重复保存相同状态
       if (this.undoStack[this.undoStack.length - 1] !== state) {
         this.undoStack.push(state);
-        
+
         // 限制栈大小
         if (this.undoStack.length > this.maxUndoSize) {
           this.undoStack.shift();
         }
-        
+
         // 清空重做栈
         this.redoStack = [];
       }
@@ -260,7 +370,7 @@ export class EditorModule {
   private restoreState(state: string): void {
     const container = this.viewer.getContainer();
     const contentElement = container.querySelector('.viewer-content');
-    
+
     if (contentElement) {
       contentElement.innerHTML = state;
     }
@@ -295,6 +405,7 @@ export class EditorModule {
     this.undoStack = [];
     this.redoStack = [];
     this.isDirty = false;
+    logger.info('编辑器已销毁');
   }
 }
 
