@@ -101,7 +101,7 @@ export const WordCountPlugin = createPlugin(
   },
   (context: PluginContext) => {
     logger.info('卸载字数统计插件');
-    
+
     const counter = context.getState('counterElement');
     if (counter && counter.parentNode) {
       counter.parentNode.removeChild(counter);
@@ -208,10 +208,10 @@ export async function exampleUsage() {
 
   // 执行插件命令
   pluginManager.executeCommand('AutoSave:restore');
-  
+
   // 禁用插件
   await pluginManager.disable('WordCount');
-  
+
   // 重新启用
   await pluginManager.enable('WordCount');
 }

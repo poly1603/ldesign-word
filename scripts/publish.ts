@@ -43,12 +43,12 @@ function writePackageJson(path: string, pkg: PackageJson): void {
  */
 function updateVersion(type: 'major' | 'minor' | 'patch'): string {
   console.log(`📦 更新版本: ${type}`);
-  
+
   const pkg = readPackageJson('.');
   const [major, minor, patch] = pkg.version.split('.').map(Number);
 
   let newVersion: string;
-  
+
   switch (type) {
     case 'major':
       newVersion = `${major + 1}.0.0`;
@@ -73,7 +73,7 @@ function updateVersion(type: 'major' | 'minor' | 'patch'): string {
  */
 function runTests(): void {
   console.log('🧪 运行测试...');
-  
+
   try {
     exec('npm run test');
     exec('npm run lint');
@@ -90,7 +90,7 @@ function runTests(): void {
  */
 function build(): void {
   console.log('🔨 构建包...');
-  
+
   try {
     exec('npm run clean');
     exec('npm run build');
@@ -106,27 +106,27 @@ function build(): void {
  */
 function generateChangelog(): void {
   console.log('📝 生成 CHANGELOG...');
-  
+
   try {
     const gitLog = exec('git log --oneline -20');
     const lines = gitLog.trim().split('\n');
-    
+
     const pkg = readPackageJson('.');
     const date = new Date().toISOString().split('T')[0];
-    
+
     let changelog = `## [${pkg.version}] - ${date}\n\n`;
     changelog += '### Changes\n\n';
-    
+
     lines.forEach(line => {
       changelog += `- ${line}\n`;
     });
-    
+
     changelog += '\n';
-    
+
     // 追加到 CHANGELOG.md
     const existingChangelog = readFileSync('CHANGELOG.md', 'utf-8').catch(() => '# Changelog\n\n');
     const newChangelog = changelog + existingChangelog;
-    
+
     writeFileSync('CHANGELOG.md', newChangelog);
     console.log('✅ CHANGELOG 已更新');
   } catch (error) {
@@ -139,7 +139,7 @@ function generateChangelog(): void {
  */
 function gitCommit(version: string): void {
   console.log('📤 Git 提交和标签...');
-  
+
   try {
     exec('git add .');
     exec(`git commit -m "chore: release v${version}"`);
@@ -155,7 +155,7 @@ function gitCommit(version: string): void {
  */
 function publishToNpm(): void {
   console.log('📦 发布到 NPM...');
-  
+
   const answer = prompt('确认发布到 NPM? (yes/no): ');
   if (answer?.toLowerCase() !== 'yes') {
     console.log('❌ 取消发布');

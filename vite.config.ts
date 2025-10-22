@@ -9,7 +9,7 @@ import path from 'path';
 export default defineConfig({
   root: '.',
   base: './',
-  
+
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -30,7 +30,7 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     minify: 'terser',
-    
+
     terserOptions: {
       compress: {
         drop_console: true,
@@ -47,7 +47,7 @@ export default defineConfig({
           'vendor-utils': ['jszip'],
           'vendor-pdf': ['jspdf', 'html2canvas'],
         },
-        
+
         // 优化 chunk 文件名
         chunkFileNames: 'chunks/[name]-[hash].js',
         entryFileNames: '[name].js',
@@ -57,7 +57,7 @@ export default defineConfig({
 
     // 构建优化
     chunkSizeWarningLimit: 1000,
-    
+
     // 压缩选项
     cssCodeSplit: true,
     assetsInlineLimit: 4096,

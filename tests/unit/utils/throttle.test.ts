@@ -32,12 +32,12 @@ describe('throttle utilities', () => {
 
       debouncedFn();
       vi.advanceTimersByTime(50);
-      
+
       debouncedFn();
       vi.advanceTimersByTime(50);
-      
+
       expect(fn).not.toHaveBeenCalled();
-      
+
       vi.advanceTimersByTime(50);
       expect(fn).toHaveBeenCalledTimes(1);
     });
@@ -48,7 +48,7 @@ describe('throttle utilities', () => {
 
       debouncedFn();
       expect(fn).toHaveBeenCalledTimes(1);
-      
+
       vi.advanceTimersByTime(100);
       expect(fn).toHaveBeenCalledTimes(1);
     });
@@ -90,7 +90,7 @@ describe('throttle utilities', () => {
 
       throttledFn();
       vi.advanceTimersByTime(100);
-      
+
       // 不应该调用 trailing call
       expect(fn).toHaveBeenCalledTimes(1);
     });

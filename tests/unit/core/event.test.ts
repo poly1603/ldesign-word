@@ -80,7 +80,7 @@ describe('EventEmitter', () => {
     });
 
     it('should handle errors in listeners', () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
       const badHandler = () => {
         throw new Error('Handler error');
       };
@@ -117,10 +117,10 @@ describe('EventEmitter', () => {
     it('should return correct listener count', () => {
       expect(emitter.listenerCount('test')).toBe(0);
 
-      emitter.on('test', () => {});
+      emitter.on('test', () => { });
       expect(emitter.listenerCount('test')).toBe(1);
 
-      emitter.on('test', () => {});
+      emitter.on('test', () => { });
       expect(emitter.listenerCount('test')).toBe(2);
     });
   });

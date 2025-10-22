@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,52 +11,61 @@
       margin: 0;
       padding: 20px;
     }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
     }
+
     #viewer-container {
       width: 100%;
       height: 600px;
       border: 1px solid #ddd;
       margin-top: 20px;
     }
+
     .metrics {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
       margin-top: 20px;
     }
+
     .metric-card {
       padding: 15px;
       background: white;
       border: 1px solid #ddd;
       border-radius: 4px;
     }
+
     .metric-value {
       font-size: 24px;
       font-weight: bold;
       color: #333;
     }
+
     .metric-label {
       font-size: 12px;
       color: #666;
       margin-top: 4px;
     }
+
     .warning {
       background: #fff3cd;
       border-color: #ffc107;
     }
+
     .critical {
       background: #f8d7da;
       border-color: #dc3545;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>⚡ Word Viewer - 性能监控示例</h1>
-    
+
     <div class="controls">
       <input type="file" id="file-input" accept=".docx,.doc" />
       <button id="start-monitor">开始监控</button>
@@ -70,17 +80,17 @@
         <div class="metric-value" id="memory-value">-</div>
         <div class="metric-label">内存使用</div>
       </div>
-      
+
       <div class="metric-card">
         <div class="metric-value" id="load-time">-</div>
         <div class="metric-label">加载时间</div>
       </div>
-      
+
       <div class="metric-card">
         <div class="metric-value" id="cache-hits">0</div>
         <div class="metric-label">缓存命中</div>
       </div>
-      
+
       <div class="metric-card">
         <div class="metric-value" id="fps">60</div>
         <div class="metric-label">帧率 (FPS)</div>
@@ -102,10 +112,10 @@
     // 内存监控
     monitor.onWarning((warning) => {
       logger.warn(`内存警告 [${warning.level}]: ${warning.message}`);
-      
+
       const card = document.getElementById('memory-card');
       card.classList.remove('warning', 'critical');
-      
+
       if (warning.level === 'critical') {
         card.classList.add('critical');
       } else if (warning.level === 'high') {
@@ -140,14 +150,14 @@
       if (!file) return;
 
       const startTime = performance.now();
-      
+
       try {
         await viewer.loadFile(file);
         const loadTime = performance.now() - startTime;
-        
+
         document.getElementById('load-time').textContent = `${loadTime.toFixed(0)}ms`;
         logger.info('文档加载完成', { loadTime: `${loadTime.toFixed(2)}ms` });
-        
+
         // 检测是否从缓存加载
         if (loadTime < 200) {
           cacheHits++;
@@ -163,9 +173,9 @@
     function updateMetrics() {
       setInterval(() => {
         const memInfo = monitor.getMemoryInfo();
-        
+
         if (memInfo.usedJSHeapSize) {
-          document.getElementById('memory-value').textContent = 
+          document.getElementById('memory-value').textContent =
             formatBytes(memInfo.usedJSHeapSize);
         }
 
@@ -192,5 +202,5 @@
     });
   </script>
 </body>
-</html>
 
+</html>

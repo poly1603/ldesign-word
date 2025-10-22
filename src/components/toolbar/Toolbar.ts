@@ -83,7 +83,7 @@ export class Toolbar {
         ],
       },
       { type: 'separator', id: 'sep1' },
-      
+
       // 编辑操作组
       {
         type: 'group',
@@ -108,7 +108,7 @@ export class Toolbar {
         ],
       },
       { type: 'separator', id: 'sep2' },
-      
+
       // 格式化组
       {
         type: 'group',
@@ -141,7 +141,7 @@ export class Toolbar {
         ],
       },
       { type: 'separator', id: 'sep3' },
-      
+
       // 插入组
       {
         type: 'group',
@@ -174,7 +174,7 @@ export class Toolbar {
         ],
       },
       { type: 'separator', id: 'sep4' },
-      
+
       // 视图组
       {
         type: 'group',
@@ -207,7 +207,7 @@ export class Toolbar {
   private render(): void {
     this.toolbarElement = document.createElement('div');
     this.toolbarElement.className = `word-viewer-toolbar word-viewer-toolbar-${this.options.position} theme-${this.options.theme}`;
-    
+
     if (this.options.customClass) {
       this.toolbarElement.classList.add(this.options.customClass);
     }
@@ -231,7 +231,7 @@ export class Toolbar {
    */
   private getToolbarStyles(): string {
     const position = this.options.position;
-    
+
     const baseStyles = `
       display: flex;
       align-items: center;
@@ -278,7 +278,7 @@ export class Toolbar {
     button.className = 'toolbar-button';
     button.id = `toolbar-${item.id}`;
     button.setAttribute('aria-label', item.tooltip || item.label || '');
-    
+
     if (item.disabled) {
       button.disabled = true;
     }
@@ -439,7 +439,7 @@ export class Toolbar {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    
+
     input.addEventListener('change', (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
@@ -532,11 +532,11 @@ export class Toolbar {
    */
   setTheme(theme: 'light' | 'dark'): void {
     this.options.theme = theme;
-    
+
     if (this.toolbarElement) {
       this.toolbarElement.classList.remove('theme-light', 'theme-dark');
       this.toolbarElement.classList.add(`theme-${theme}`);
-      
+
       // 重新应用样式
       this.toolbarElement.style.cssText = this.getToolbarStyles();
     }

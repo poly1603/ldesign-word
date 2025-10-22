@@ -116,7 +116,7 @@ const coreConfig = {
       brotliSize: true,
     }),
   ].filter(Boolean),
-  
+
   // Tree-shaking 优化
   treeshake: {
     moduleSideEffects: false,

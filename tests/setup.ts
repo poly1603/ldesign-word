@@ -8,10 +8,10 @@ import { afterEach, beforeEach, vi } from 'vitest';
 beforeEach(() => {
   // 清理 DOM
   document.body.innerHTML = '';
-  
+
   // 清理 localStorage
   localStorage.clear();
-  
+
   // 清理 sessionStorage
   sessionStorage.clear();
 });
@@ -19,7 +19,7 @@ beforeEach(() => {
 afterEach(() => {
   // 清理所有 mock
   vi.clearAllMocks();
-  
+
   // 清理所有定时器
   vi.clearAllTimers();
 });
@@ -37,21 +37,21 @@ if (typeof Worker === 'undefined') {
   (global as any).Worker = class MockWorker {
     onmessage: ((event: MessageEvent) => void) | null = null;
     onerror: ((event: ErrorEvent) => void) | null = null;
-    
-    constructor(public scriptURL: string) {}
-    
+
+    constructor(public scriptURL: string) { }
+
     postMessage(data: any): void {
       // Mock implementation
     }
-    
+
     terminate(): void {
       // Mock implementation
     }
-    
+
     addEventListener(type: string, listener: EventListener): void {
       // Mock implementation
     }
-    
+
     removeEventListener(type: string, listener: EventListener): void {
       // Mock implementation
     }

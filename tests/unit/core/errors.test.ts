@@ -46,7 +46,7 @@ describe('Custom Error Classes', () => {
   describe('LoadError', () => {
     it('should create load error', () => {
       const error = new LoadError('Load failed');
-      
+
       expect(error).toBeInstanceOf(LoadError);
       expect(error).toBeInstanceOf(WordViewerError);
       expect(error.code).toBe('LOAD_ERROR');
@@ -56,7 +56,7 @@ describe('Custom Error Classes', () => {
   describe('ParseError', () => {
     it('should create parse error', () => {
       const error = new ParseError('Parse failed');
-      
+
       expect(error).toBeInstanceOf(ParseError);
       expect(error.code).toBe('PARSE_ERROR');
     });
@@ -65,7 +65,7 @@ describe('Custom Error Classes', () => {
   describe('NetworkError', () => {
     it('should create network error with status', () => {
       const error = new NetworkError('Network failed', 404, 'Not Found');
-      
+
       expect(error).toBeInstanceOf(NetworkError);
       expect(error.status).toBe(404);
       expect(error.statusText).toBe('Not Found');
@@ -94,7 +94,7 @@ describe('Custom Error Classes', () => {
 describe('ErrorBoundary', () => {
   it('should add and remove handlers', () => {
     const boundary = new ErrorBoundary();
-    const handler = () => {};
+    const handler = () => { };
 
     boundary.addHandler(handler);
     boundary.removeHandler(handler);

@@ -34,38 +34,38 @@ describe('Logger', () => {
 
   describe('logging methods', () => {
     it('should log debug messages', () => {
-      const consoleSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
-      
+      const consoleSpy = vi.spyOn(console, 'debug').mockImplementation(() => { });
+
       logger.debug('Debug message');
       expect(consoleSpy).toHaveBeenCalled();
-      
+
       consoleSpy.mockRestore();
     });
 
     it('should log info messages', () => {
-      const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
-      
+      const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => { });
+
       logger.info('Info message');
       expect(consoleSpy).toHaveBeenCalled();
-      
+
       consoleSpy.mockRestore();
     });
 
     it('should log warn messages', () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
+
       logger.warn('Warning message');
       expect(consoleSpy).toHaveBeenCalled();
-      
+
       consoleSpy.mockRestore();
     });
 
     it('should log error messages', () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+
       logger.error('Error message');
       expect(consoleSpy).toHaveBeenCalled();
-      
+
       consoleSpy.mockRestore();
     });
   });
@@ -73,10 +73,10 @@ describe('Logger', () => {
   describe('log level filtering', () => {
     it('should respect log level', () => {
       logger.setLevel(LogLevel.WARN);
-      
-      const debugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
-      const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const debugSpy = vi.spyOn(console, 'debug').mockImplementation(() => { });
+      const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => { });
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
 
       logger.debug('Debug');
       logger.info('Info');
@@ -95,7 +95,7 @@ describe('Logger', () => {
   describe('log entries', () => {
     it('should store log entries', () => {
       logger.info('Test message');
-      
+
       const entries = logger.getEntries();
       expect(entries.length).toBeGreaterThan(0);
       expect(entries[entries.length - 1].message).toBe('Test message');
@@ -114,7 +114,7 @@ describe('Logger', () => {
     it('should clear entries', () => {
       logger.info('Test');
       logger.clear();
-      
+
       expect(logger.getEntries().length).toBe(0);
     });
   });
@@ -122,14 +122,14 @@ describe('Logger', () => {
   describe('export', () => {
     it('should export as JSON', () => {
       logger.info('Test message', { data: 'value' });
-      
+
       const json = logger.export('json');
       expect(() => JSON.parse(json)).not.toThrow();
     });
 
     it('should export as text', () => {
       logger.info('Test message');
-      
+
       const text = logger.export('text');
       expect(text).toContain('Test message');
     });

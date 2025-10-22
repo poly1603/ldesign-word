@@ -28,7 +28,7 @@ describe('memory utilities', () => {
     it('should handle circular references', () => {
       const obj: any = { name: 'test' };
       obj.self = obj;
-      
+
       expect(() => estimateSize(obj)).not.toThrow();
     });
   });
@@ -55,7 +55,7 @@ describe('memory utilities', () => {
 
     it('should allow setting thresholds', () => {
       const monitor = new MemoryMonitor();
-      
+
       expect(() => {
         monitor.setThresholds({
           low: 50,
@@ -68,7 +68,7 @@ describe('memory utilities', () => {
 
     it('should start and stop monitoring', () => {
       const monitor = new MemoryMonitor();
-      
+
       monitor.start();
       expect(() => monitor.stop()).not.toThrow();
     });
@@ -76,10 +76,10 @@ describe('memory utilities', () => {
     it('should call warning callbacks', () => {
       const monitor = new MemoryMonitor();
       const callback = vi.fn();
-      
+
       monitor.onWarning(callback);
       monitor.offWarning(callback);
-      
+
       expect(callback).not.toHaveBeenCalled();
     });
   });
