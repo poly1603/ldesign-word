@@ -394,10 +394,66 @@ export class CollaborationManager {
 }
 
 /**
- * 版本管理器
- */
+| * 版本管理器（快照管理）
+| */
 export class VersionManager {
-  private versions: Map<string, { content: string; timestamp: number; author: string }> =
+  private versions: Map<string, { content: string; timestamp: number; author: string; description?: string }> = new Map();
+  private maxVersions: number = 50;
+
+  /**
+   * 创建版本快照
+   */
+  createSnapshot(content: string, author: string, description?: string): string {
+    const id = `version_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    this.versions.set(id, {
+      content,
+      timestamp: Date.now(),
+      author,
+      description,
+    });
+
+    // 限制版本数量
+    if (this.versions.size > this.maxVersions) {
+      const oldestId = Array.from(this.versions.keys())[0];
+      this.versions.delete(oldestId);
+    }
+
+    logger.info('创建版本快照', { id, author });
+    return id;
+  }
+
+  /**
+   * 获取版本
+   */
+  getVersion(id: string): { content: string; timestamp: number; author: string; description?: string } | undefined {
+    return this.versions.get(id);
+  }
+
+  /**
+   * 获取所有版本
+   */
+  getAllVersions(): Array<{ id: string; content: string; timestamp: number; author: string; description?: string }> {
+    return Array.from(this.versions.entries()).map(([id, data]) => ({
+      id,
+      ...data,
+    }));
+  }
+
+  /**
+   * 删除版本
+   */
+  deleteVersion(id: string): boolean {
+    return this.versions.delete(id);
+  }
+
+  /**
+   * 清空所有版本
+   */
+  clear(): void {
+    this.versions.clear();
+  }
+}
     new Map();
   private currentVersion: string | null = null;
   private maxVersions: number = 50;
