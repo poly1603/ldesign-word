@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word Viewer 测试</title>
+  <link rel="stylesheet" href="./packages/core/dist/index.umd.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    input[type="file"] {
+      padding: 10px;
+      border: 2px solid #667eea;
+      border-radius: 8px;
+    }
+
+    input[type="range"] {
+      width: 200px;
+    }
+
+    #viewer-container {
+      margin-top: 20px;
+      min-height: 500px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      background: white;
+      overflow: auto;
+    }
+
+    .status {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .status h3 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .status p {
+      margin: 5px 0;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>📄 Word Viewer 测试页面</h1>
+
+    <div class="controls">
+      <input type="file" id="fileInput" accept=".doc,.docx">
+      <button onclick="loadSample()">加载示例</button>
+      <button onclick="zoomIn()">放大 +</button>
+      <button onclick="zoomOut()">缩小 -</button>
+      <input type="range" id="zoomSlider" min="50" max="200" value="100" onchange="handleZoom(this.value)">
+      <span id="zoomDisplay">100%</span>
+    </div>
+
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="搜索关键词"
+        style="padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+      <button onclick="search()">搜索</button>
+      <button onclick="toggleEdit()">切换编辑模式</button>
+      <button onclick="exportPDF()">导出 PDF</button>
+      <button onclick="exportHTML()">导出 HTML</button>
+    </div>
+
+    <div id="viewer-container"></div>
+
+    <div class="status">
+      <h3>状态信息</h3>
+      <p id="status">等待加载文档...</p>
+      <p id="info"></p>
+    </div>
+  </div>
+
+  <script src="./packages/core/dist/index.umd.js"></script>
+  <script>
+    let viewer = null;
+    let editMode = false;
+
+    // 初始化查看器
+    function initViewer() {
+      if (!viewer) {
+        viewer = new WordViewer('#viewer-container', {
+          renderEngine: 'auto',
+          theme: 'light',
+          editable: false,
+          showToolbar: false,
+        });
+
+        viewer.on('loaded', (e) => {
+          document.getElementById('status').textContent = '✅ 文档加载成功';
+          const info = viewer.getDocumentInfo();
+          if (info) {
+            document.getElementById('info').innerHTML = `
+              标题: ${info.title || '未命名'}<br>
+              页数: ${info.pageCount || 1}<br>
+              字数: ${info.wordCount || 0}
+            `;
+          }
+        });
+
+        viewer.on('error', (error) => {
+          document.getElementById('status').textContent = '❌ 加载失败: ' + error.message;
+        });
+
+        viewer.on('progress', (progress) => {
+          document.getElementById('status').textContent = `加载中... ${progress.percentage}%`;
+        });
+      }
+      return viewer;
+    }
+
+    // 文件上传
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const v = initViewer();
+      try {
+        await v.loadFile(file);
+      } catch (err) {
+        alert('加载失败: ' + err.message);
+      }
+    });
+
+    // 加载示例
+    async function loadSample() {
+      const v = initViewer();
+      try {
+        // 这里应该是实际的示例文档URL
+        alert('请通过"选择文件"上传一个 .docx 文档进行测试');
+      } catch (err) {
+        alert('加载失败: ' + err.message);
+      }
+    }
+
+    // 缩放控制
+    function zoomIn() {
+      if (!viewer) {
+        alert('请先加载文档');
+        return;
+      }
+      const current = viewer.getZoom();
+      viewer.setZoom(Math.min(2, current + 0.1));
+      updateZoomDisplay(viewer.getZoom());
+    }
+
+    function zoomOut() {
+      if (!viewer) {
+        alert('请先加载文档');
+        return;
+      }
+      const current = viewer.getZoom();
+      viewer.setZoom(Math.max(0.5, current - 0.1));
+      updateZoomDisplay(viewer.getZoom());
+    }
+
+    function handleZoom(value) {
+      if (!viewer) {
+        alert('请先加载文档');
+        return;
+      }
+      viewer.setZoom(value / 100);
+      updateZoomDisplay(value / 100);
+    }
+
+    function updateZoomDisplay(zoom) {
+      const percent = Math.round(zoom * 100);
+      document.getElementById('zoomDisplay').textContent = percent + '%';
+      document.getElementById('zoomSlider').value = percent;
+    }
+
+    // 搜索
+    function search() {
+      if (!viewer) {
+        alert('请先加载文档');
+        return;
+      }
+      const keyword = document.getElementById('searchInput').value;
+      if (!keyword) {
+        alert('请输入搜索关键词');
+        return;
+      }
+      const results = viewer.search(keyword);
+      alert(`找到 ${results.length} 处匹配`);
+    }
+
+    // 切换编辑模式
+    function toggleEdit() {
+      if (!viewer) {
+        alert('请先加载文档');
+        return;
+      }
+      editMode = !editMode;
+      if (editMode) {
+        viewer.enableEdit();
+        document.getElementById('status').textContent = '✏️ 编辑模式已启用';
+      } else {
+        viewer.disableEdit();
+        document.getElementById('status').textContent = '👁️ 查看模式';
+      }
+    }
+
+    // 导出 PDF
+    async function exportPDF() {
+      if (!viewer) {
+        alert('请先加载文档');
+        return;
+      }
+      try {
+        const blob = await viewer.exportToPDF();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'document.pdf';
+        a.click();
+        URL.revokeObjectURL(url);
+        alert('PDF 导出成功');
+      } catch (err) {
+        alert('导出失败: ' + err.message);
+      }
+    }
+
+    // 导出 HTML
+    function exportHTML() {
+      if (!viewer) {
+        alert('请先加载文档');
+        return;
+      }
+      try {
+        const html = viewer.exportToHTML();
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'document.html';
+        a.click();
+        URL.revokeObjectURL(url);
+        alert('HTML 导出成功');
+      } catch (err) {
+        alert('导出失败: ' + err.message);
+      }
+    }
+  </script>
+</body>
+
+</html>

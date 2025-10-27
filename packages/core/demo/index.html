@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@word-viewer/core - 演示</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+
+<body>
+  <div id="app">
+    <header>
+      <h1>📄 @word-viewer/core 演示</h1>
+      <p>Word 文档查看器核心库的完整功能演示</p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="basic">基础用法</button>
+      <button class="tab" data-tab="advanced">高级功能</button>
+      <button class="tab" data-tab="events">事件处理</button>
+      <button class="tab" data-tab="export">导出功能</button>
+      <button class="tab" data-tab="edit">编辑功能</button>
+      <button class="tab" data-tab="api">API 测试</button>
+    </nav>
+
+    <!-- 基础用法 -->
+    <div id="basic" class="tab-content active">
+      <h2>基础用法</h2>
+      <div class="demo-section">
+        <h3>1. 从文件加载</h3>
+        <input type="file" id="fileInput" accept=".doc,.docx">
+        <button id="loadFile">加载文件</button>
+        <div id="viewer1" class="viewer-container"></div>
+      </div>
+
+      <div class="demo-section">
+        <h3>2. 从URL加载</h3>
+        <input type="text" id="urlInput" placeholder="输入文档URL" value="/samples/sample.docx">
+        <button id="loadUrl">加载URL</button>
+        <div id="viewer2" class="viewer-container"></div>
+      </div>
+
+      <div class="demo-section">
+        <h3>3. 从ArrayBuffer加载</h3>
+        <button id="loadBuffer">加载示例Buffer</button>
+        <div id="viewer3" class="viewer-container"></div>
+      </div>
+    </div>
+
+    <!-- 高级功能 -->
+    <div id="advanced" class="tab-content">
+      <h2>高级功能</h2>
+      <div class="demo-section">
+        <h3>缩放控制</h3>
+        <div class="controls">
+          <button id="zoomIn">放大</button>
+          <button id="zoomOut">缩小</button>
+          <button id="zoomReset">重置</button>
+          <input type="range" id="zoomSlider" min="50" max="200" value="100">
+          <span id="zoomValue">100%</span>
+        </div>
+        <div id="viewer4" class="viewer-container"></div>
+      </div>
+
+      <div class="demo-section">
+        <h3>搜索功能</h3>
+        <input type="text" id="searchInput" placeholder="搜索关键词">
+        <button id="search">搜索</button>
+        <button id="clearSearch">清除</button>
+        <div id="searchResults"></div>
+        <div id="viewer5" class="viewer-container"></div>
+      </div>
+
+      <div class="demo-section">
+        <h3>页面导航</h3>
+        <div class="controls">
+          <button id="firstPage">第一页</button>
+          <button id="prevPage">上一页</button>
+          <span id="pageInfo">1 / 1</span>
+          <button id="nextPage">下一页</button>
+          <button id="lastPage">最后一页</button>
+          <input type="number" id="pageInput" min="1" placeholder="页码">
+          <button id="goToPage">跳转</button>
+        </div>
+        <div id="viewer6" class="viewer-container"></div>
+      </div>
+    </div>
+
+    <!-- 事件处理 -->
+    <div id="events" class="tab-content">
+      <h2>事件处理</h2>
+      <div class="demo-section">
+        <h3>事件监听</h3>
+        <button id="loadEventDemo">加载文档</button>
+        <div class="event-log-container">
+          <h4>事件日志</h4>
+          <div id="eventLog" class="event-log"></div>
+        </div>
+        <div id="viewer7" class="viewer-container"></div>
+      </div>
+    </div>
+
+    <!-- 导出功能 -->
+    <div id="export" class="tab-content">
+      <h2>导出功能</h2>
+      <div class="demo-section">
+        <h3>文档导出</h3>
+        <button id="loadExportDemo">先加载文档</button>
+        <div class="export-controls">
+          <button id="exportPDF">导出为 PDF</button>
+          <button id="exportHTML">导出为 HTML</button>
+          <button id="exportDocx">导出为 DOCX</button>
+          <button id="exportText">导出为 TXT</button>
+        </div>
+        <div id="viewer8" class="viewer-container"></div>
+      </div>
+    </div>
+
+    <!-- 编辑功能 -->
+    <div id="edit" class="tab-content">
+      <h2>编辑功能</h2>
+      <div class="demo-section">
+        <h3>文档编辑</h3>
+        <button id="loadEditDemo">加载可编辑文档</button>
+        <div class="edit-controls">
+          <button id="toggleEdit">切换编辑模式</button>
+          <div class="format-buttons">
+            <button id="bold">粗体</button>
+            <button id="italic">斜体</button>
+            <button id="underline">下划线</button>
+            <button id="insertText">插入文本</button>
+            <button id="insertImage">插入图片</button>
+          </div>
+          <div class="edit-actions">
+            <button id="undo">撤销</button>
+            <button id="redo">重做</button>
+            <button id="save">保存</button>
+          </div>
+        </div>
+        <div id="editStatus" class="status"></div>
+        <div id="viewer9" class="viewer-container"></div>
+      </div>
+    </div>
+
+    <!-- API 测试 -->
+    <div id="api" class="tab-content">
+      <h2>API 测试</h2>
+      <div class="demo-section">
+        <h3>完整 API 演示</h3>
+        <div class="api-controls">
+          <button id="testInit">初始化</button>
+          <button id="testLoad">加载文档</button>
+          <button id="testGetInfo">获取文档信息</button>
+          <button id="testGetOptions">获取配置</button>
+          <button id="testUpdateOptions">更新配置</button>
+          <button id="testDestroy">销毁实例</button>
+        </div>
+        <div class="api-output">
+          <h4>输出结果</h4>
+          <pre id="apiOutput"></pre>
+        </div>
+        <div id="viewer10" class="viewer-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
