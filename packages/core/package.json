@@ -1,8 +1,8 @@
-{
+﻿{
   "name": "@word-viewer/core",
   "version": "1.0.0",
   "type": "module",
-  "description": "核心 Word 文档查看和编辑库",
+  "description": "Core Word document viewer and editor library",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "browser": "dist/index.umd.js",
@@ -29,7 +29,7 @@
   "dependencies": {
     "docx-preview": "^0.3.0",
     "mammoth": "^1.6.0",
-    "docx": "^8.5.0",
+    "docx": "^9.0.2",
     "jszip": "^3.10.1"
   },
   "devDependencies": {
@@ -39,7 +39,7 @@
     "postcss": "^8.4.31",
     "rollup": "^4.1.4",
     "rollup-plugin-postcss": "^4.0.2",
-    "rollup-plugin-terser": "^7.0.2",
+    "@rollup/plugin-terser": "^0.4.4",
     "tslib": "^2.6.2",
     "typescript": "^5.2.2"
   }
