@@ -23,8 +23,7 @@
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
-    "type-check": "tsc --noEmit",
-    "prepare": "husky install"
+    "type-check": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -116,4 +115,3 @@
     }
   }
 }
-
