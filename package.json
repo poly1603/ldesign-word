@@ -4,7 +4,8 @@
   "private": true,
   "description": "功能强大的 Word 文档查看和编辑插件，支持多种框架",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "playground"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
@@ -12,7 +13,8 @@
     "build:vue": "npm run build -w @word-viewer/vue",
     "build:react": "npm run build -w @word-viewer/react",
     "build:lit": "npm run build -w @word-viewer/lit",
-    "dev": "npm run dev --workspaces --if-present",
+    "dev": "npm run dev -w playground",
+    "dev:all": "npm run dev --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
     "test": "vitest",
     "test:watch": "vitest --watch",

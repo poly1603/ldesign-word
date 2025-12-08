@@ -1,0 +1,2 @@
+# 空的 workspace 配置，阻止 pnpm 向上查找父级工作区
+packages: []

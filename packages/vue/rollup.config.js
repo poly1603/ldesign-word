@@ -1,51 +1,39 @@
+import vue from 'rollup-plugin-vue';
+import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
-import vue from 'rollup-plugin-vue';
 import postcss from 'rollup-plugin-postcss';
-import { terser } from 'rollup-plugin-terser';
-
-const production = !process.env.ROLLUP_WATCH;
 
 export default {
   input: 'src/index.ts',
   output: [
     {
-      file: 'dist/index.esm.js',
-      format: 'es',
-      sourcemap: true,
-    },
-    {
-      file: 'dist/index.cjs.js',
+      file: 'dist/index.js',
       format: 'cjs',
       sourcemap: true,
-      exports: 'named',
+      exports: 'named'
     },
+    {
+      file: 'dist/index.esm.js',
+      format: 'esm',
+      sourcemap: true
+    }
   ],
   external: ['vue', '@word-viewer/core'],
   plugins: [
     vue({
-      target: 'browser',
-      preprocessStyles: false,
-      css: false,
+      preprocessStyles: true
     }),
-    postcss({
-      extract: false,
-      inject: true,
-    }),
-    resolve({
-      extensions: ['.js', '.ts', '.vue'],
-    }),
+    resolve(),
     commonjs(),
     typescript({
       tsconfig: './tsconfig.json',
       declaration: true,
-      declarationDir: 'dist',
-      rootDir: 'src',
-      exclude: ['**/*.vue'],
+      declarationDir: './dist'
     }),
-    production && terser(),
-  ].filter(Boolean),
+    postcss({
+      extract: 'styles/index.css',
+      minimize: true
+    })
+  ]
 };
-
-

@@ -1,25 +1,42 @@
-/**
- * @word-viewer/vue
- * Vue 3 组件封装
- */
+import type { App, Plugin } from 'vue';
+import WordViewer from './components/WordViewer.vue';
 
-import WordViewerComponent from './WordViewer.vue';
+// 导出组件
+export { WordViewer };
 
-export { WordViewerComponent };
-export default WordViewerComponent;
+// 导出 composables
+export {
+  useWordViewer,
+  useDocumentDrop,
+  type UseWordViewerReturn,
+  type UseDocumentDropReturn,
+  type UseDocumentDropOptions
+} from './composables';
 
-// 重新导出核心类型
+// 从 core 包重新导出类型
 export type {
-  ViewerOptions,
-  DocumentSource,
+  WordDocument,
+  RenderOptions,
+  ThemeConfig,
+  PrintOptions,
+  TocItem,
   SearchResult,
-  TextFormat,
-  DocumentInfo,
-  PageInfo,
-  ExportOptions,
   EventType,
-  EventCallback,
+  EventData,
+  WordViewerOptions
 } from '@word-viewer/core';
 
+// 从 core 包重新导出常量
+export { THEMES } from '@word-viewer/core';
 
+/**
+ * Vue 插件安装函数
+ */
+export const WordViewerPlugin: Plugin = {
+  install(app: App) {
+    app.component('WordViewer', WordViewer);
+  }
+};
 
+// 默认导出插件
+export default WordViewerPlugin;

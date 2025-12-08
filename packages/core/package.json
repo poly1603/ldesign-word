@@ -1,48 +1,47 @@
-﻿{
+{
   "name": "@word-viewer/core",
   "version": "1.0.0",
-  "type": "module",
-  "description": "Core Word document viewer and editor library",
-  "main": "dist/index.cjs.js",
+  "description": "核心 Word 文档解析和渲染引擎，与框架无关",
+  "main": "dist/index.js",
   "module": "dist/index.esm.js",
-  "browser": "dist/index.umd.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/styles/index.css"
+  },
   "files": [
     "dist",
-    "src"
+    "README.md"
   ],
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "clean": "rimraf dist"
+    "build": "rollup -c rollup.config.js",
+    "dev": "rollup -c rollup.config.js -w",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "word",
     "docx",
-    "doc",
     "viewer",
-    "editor",
-    "document"
+    "document",
+    "parser"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "docx-preview": "^0.3.0",
-    "mammoth": "^1.6.0",
-    "docx": "^9.0.2",
     "jszip": "^3.10.1"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-typescript": "^11.1.5",
-    "postcss": "^8.4.31",
+    "rimraf": "^5.0.5",
     "rollup": "^4.1.4",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-commonjs": "^25.0.7",
     "rollup-plugin-postcss": "^4.0.2",
-    "@rollup/plugin-terser": "^0.4.4",
-    "tslib": "^2.6.2",
     "typescript": "^5.2.2"
   }
 }
-
-

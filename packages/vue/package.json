@@ -1,48 +1,55 @@
 {
   "name": "@word-viewer/vue",
   "version": "1.0.0",
-  "type": "module",
-  "description": "Vue 3 组件封装 - Word 文档查看器",
-  "main": "dist/index.cjs.js",
+  "description": "Word 文档查看器 Vue 3 组件",
+  "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/styles/index.css"
+  },
   "files": [
     "dist",
-    "src"
+    "README.md"
   ],
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "clean": "rimraf dist"
+    "build": "rollup -c rollup.config.js",
+    "dev": "rollup -c rollup.config.js -w",
+    "clean": "rimraf dist",
+    "type-check": "vue-tsc --noEmit"
   },
   "keywords": [
     "word",
     "docx",
     "viewer",
     "vue",
-    "vue3"
+    "vue3",
+    "component"
   ],
   "author": "",
   "license": "MIT",
-  "peerDependencies": {
-    "vue": "^3.0.0",
-    "@word-viewer/core": "workspace:*"
-  },
   "dependencies": {
-    "@word-viewer/core": "workspace:*"
+    "@word-viewer/core": "^1.0.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.3.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-typescript": "^11.1.5",
-    "postcss": "^8.4.31",
+    "@vue/compiler-sfc": "^3.3.4",
+    "rimraf": "^5.0.5",
     "rollup": "^4.1.4",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-vue": "^6.0.0",
-    "rollup-plugin-terser": "^7.0.2",
     "typescript": "^5.2.2",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "vue-tsc": "^1.8.0"
   }
 }
-
-

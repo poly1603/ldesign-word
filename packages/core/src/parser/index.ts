@@ -1,0 +1,1 @@
+export { DocxParser } from './DocxParser';

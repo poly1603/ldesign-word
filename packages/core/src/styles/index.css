@@ -1,0 +1,431 @@
+/**
+ * Word Viewer 核心样式
+ */
+
+/* 根容器 */
+.wv-root {
+  --wv-primary-color: #1976d2;
+  --wv-primary-hover: #1565c0;
+  --wv-text-color: #333333;
+  --wv-text-secondary: #666666;
+  --wv-border-color: #e0e0e0;
+  --wv-bg-color: #f0f0f0;
+  --wv-page-color: #ffffff;
+  --wv-toolbar-bg: #ffffff;
+  --wv-sidebar-bg: #fafafa;
+  
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--wv-text-color);
+}
+
+/* 工具栏 */
+.wv-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: var(--wv-toolbar-bg);
+  border-bottom: 1px solid var(--wv-border-color);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.wv-toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.wv-toolbar-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.wv-toolbar-btn:active {
+  background-color: #e0e0e0;
+}
+
+.wv-toolbar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wv-separator {
+  width: 1px;
+  height: 20px;
+  background-color: var(--wv-border-color);
+  margin: 0 4px;
+}
+
+/* 搜索框 */
+.wv-search {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wv-search-input {
+  width: 200px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--wv-border-color);
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.wv-search-input:focus {
+  border-color: var(--wv-primary-color);
+}
+
+.wv-search-input::placeholder {
+  color: #999;
+}
+
+/* 主体区域 */
+.wv-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 侧边栏 */
+.wv-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--wv-border-color);
+  background-color: var(--wv-sidebar-bg);
+  overflow: hidden;
+}
+
+/* 内容区域 */
+.wv-content {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  background-color: var(--wv-bg-color);
+}
+
+/* 文档容器 */
+.wv-document {
+  min-height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* 页面 */
+.wv-page {
+  background-color: var(--wv-page-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin: 20px auto;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 段落 */
+.wv-paragraph {
+  margin: 0;
+  padding: 0;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* 文字运行 */
+.wv-run {
+  white-space: pre-wrap;
+}
+
+/* 图片 */
+.wv-image {
+  max-width: 100%;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.wv-image:hover {
+  opacity: 0.9;
+}
+
+/* 表格 */
+.wv-table {
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+.wv-table-row {
+  /* 行样式 */
+}
+
+.wv-table-cell {
+  border: 1px solid #000;
+  padding: 5px;
+  vertical-align: top;
+}
+
+/* 超链接 */
+.wv-hyperlink {
+  color: var(--wv-primary-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.wv-hyperlink:hover {
+  color: var(--wv-primary-hover);
+}
+
+/* 编号 */
+.wv-numbering {
+  display: inline-block;
+  min-width: 2em;
+  margin-right: 8px;
+}
+
+/* 分页符 */
+.wv-page-break {
+  page-break-after: always;
+  break-after: page;
+}
+
+/* 搜索高亮 */
+.wv-search-highlight {
+  background-color: #ffeb3b;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.wv-search-highlight-active {
+  background-color: #ff9800;
+}
+
+/* 目录面板 */
+.wv-toc-panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.wv-toc-panel h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--wv-text-color);
+}
+
+.wv-toc-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wv-toc-panel li {
+  margin: 4px 0;
+}
+
+.wv-toc-link {
+  display: block;
+  padding: 6px 12px;
+  color: var(--wv-text-color);
+  text-decoration: none;
+  border-radius: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.wv-toc-link:hover {
+  background-color: #e3f2fd;
+  color: var(--wv-primary-color);
+}
+
+.wv-toc-link.active {
+  background-color: #e3f2fd;
+  color: var(--wv-primary-color);
+}
+
+/* 状态栏 */
+.wv-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 16px;
+  background-color: #f5f5f5;
+  border-top: 1px solid var(--wv-border-color);
+  font-size: 12px;
+  color: var(--wv-text-secondary);
+  flex-shrink: 0;
+}
+
+/* 加载状态 */
+.wv-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.wv-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e0e0e0;
+  border-top-color: var(--wv-primary-color);
+  border-radius: 50%;
+  animation: wv-spin 0.8s linear infinite;
+}
+
+@keyframes wv-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 错误状态 */
+.wv-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.wv-error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.wv-error-message {
+  font-size: 16px;
+  color: var(--wv-text-secondary);
+  margin-bottom: 16px;
+}
+
+.wv-error-retry {
+  padding: 8px 24px;
+  font-size: 14px;
+  color: white;
+  background-color: var(--wv-primary-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.wv-error-retry:hover {
+  background-color: var(--wv-primary-hover);
+}
+
+/* 暗色主题 */
+.wv-root[data-theme="dark"] {
+  --wv-text-color: #e0e0e0;
+  --wv-text-secondary: #a0a0a0;
+  --wv-border-color: #444444;
+  --wv-bg-color: #1e1e1e;
+  --wv-page-color: #2d2d2d;
+  --wv-toolbar-bg: #252525;
+  --wv-sidebar-bg: #1e1e1e;
+}
+
+/* 复古主题 */
+.wv-root[data-theme="sepia"] {
+  --wv-text-color: #5c4b37;
+  --wv-text-secondary: #8b7355;
+  --wv-border-color: #d4c7b0;
+  --wv-bg-color: #f4ecd8;
+  --wv-page-color: #fbf7f0;
+  --wv-toolbar-bg: #f4ecd8;
+  --wv-sidebar-bg: #f4ecd8;
+}
+
+/* 打印样式 */
+@media print {
+  .wv-toolbar,
+  .wv-sidebar,
+  .wv-status-bar {
+    display: none !important;
+  }
+
+  .wv-document {
+    background: none !important;
+    padding: 0 !important;
+  }
+
+  .wv-page {
+    width: 100% !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    page-break-after: always;
+  }
+
+  .wv-page:last-child {
+    page-break-after: auto;
+  }
+
+  .wv-search-highlight {
+    background: none !important;
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .wv-sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .wv-search-input {
+    width: 150px;
+  }
+
+  .wv-toolbar {
+    padding: 8px;
+    gap: 4px;
+  }
+}
+
+/* 滚动条样式 */
+.wv-content::-webkit-scrollbar,
+.wv-sidebar::-webkit-scrollbar,
+.wv-toc-panel::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.wv-content::-webkit-scrollbar-track,
+.wv-sidebar::-webkit-scrollbar-track,
+.wv-toc-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wv-content::-webkit-scrollbar-thumb,
+.wv-sidebar::-webkit-scrollbar-thumb,
+.wv-toc-panel::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.wv-content::-webkit-scrollbar-thumb:hover,
+.wv-sidebar::-webkit-scrollbar-thumb:hover,
+.wv-toc-panel::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
