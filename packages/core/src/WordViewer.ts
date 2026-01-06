@@ -6,7 +6,10 @@ import type {
   TocItem,
   SearchResult,
   EventType,
-  EventData
+  EventData,
+  ViewMode,
+  BookmarkItem,
+  AnnotationItem
 } from './types';
 import { THEMES } from './types';
 import { DocxParser } from './parser/DocxParser';
@@ -15,6 +18,15 @@ import { EventEmitter } from './events/EventEmitter';
 import { SearchManager, SearchOptions } from './features/SearchManager';
 import { TocManager } from './features/TocManager';
 import { PrintManager } from './features/PrintManager';
+import { ExportManager } from './features/ExportManager';
+import { ThumbnailManager } from './features/ThumbnailManager';
+import { ViewModeManager } from './features/ViewModeManager';
+import { SelectionManager } from './features/SelectionManager';
+import { BookmarkManager } from './features/BookmarkManager';
+import { CommentManager } from './features/CommentManager';
+import { FootnoteManager } from './features/FootnoteManager';
+import { AnnotationManager } from './features/AnnotationManager';
+import { VirtualScrollRenderer } from './features/VirtualScrollRenderer';
 import { Icons, createIconElement } from './utils/icons';
 
 /**
@@ -31,10 +43,26 @@ export interface WordViewerOptions extends Omit<Partial<RenderOptions>, 'contain
   enableToolbar?: boolean;
   /** 是否启用打印功能 */
   enablePrint?: boolean;
+  /** 是否启用导出功能 */
+  enableExport?: boolean;
+  /** 是否启用缩略图 */
+  enableThumbnails?: boolean;
+  /** 是否启用书签 */
+  enableBookmarks?: boolean;
+  /** 是否启用批注 */
+  enableComments?: boolean;
+  /** 是否启用脚注 */
+  enableFootnotes?: boolean;
+  /** 是否启用标注 */
+  enableAnnotations?: boolean;
+  /** 是否启用虚拟滚动 */
+  enableVirtualScroll?: boolean;
   /** 初始缩放比例 */
   initialScale?: number;
   /** 初始主题 */
   initialTheme?: 'light' | 'dark' | 'sepia' | ThemeConfig;
+  /** 初始视图模式 */
+  initialViewMode?: ViewMode;
   /** 语言 */
   locale?: 'zh-CN' | 'en-US';
 }
@@ -63,6 +91,15 @@ export class WordViewer {
   private searchManager: SearchManager;
   private tocManager: TocManager;
   private printManager: PrintManager;
+  private exportManager: ExportManager;
+  private thumbnailManager: ThumbnailManager;
+  private viewModeManager: ViewModeManager;
+  private selectionManager: SelectionManager;
+  private bookmarkManager: BookmarkManager;
+  private commentManager: CommentManager;
+  private footnoteManager: FootnoteManager;
+  private annotationManager: AnnotationManager;
+  private virtualScrollRenderer: VirtualScrollRenderer;
   private isLoading = false;
   private classPrefix = 'wv';
 
@@ -79,8 +116,16 @@ export class WordViewer {
       enableSearch: true,
       enableToolbar: true,
       enablePrint: true,
+      enableExport: true,
+      enableThumbnails: true,
+      enableBookmarks: true,
+      enableComments: true,
+      enableFootnotes: true,
+      enableAnnotations: true,
+      enableVirtualScroll: false,
       initialScale: 1,
       initialTheme: 'light',
+      initialViewMode: 'continuous',
       locale: 'zh-CN',
       ...options
     };
@@ -117,6 +162,15 @@ export class WordViewer {
     this.searchManager = new SearchManager(this.eventEmitter);
     this.tocManager = new TocManager(this.eventEmitter);
     this.printManager = new PrintManager(this.eventEmitter);
+    this.exportManager = new ExportManager(this.eventEmitter);
+    this.thumbnailManager = new ThumbnailManager(this.eventEmitter);
+    this.viewModeManager = new ViewModeManager(this.eventEmitter);
+    this.selectionManager = new SelectionManager(this.eventEmitter);
+    this.bookmarkManager = new BookmarkManager(this.eventEmitter);
+    this.commentManager = new CommentManager(this.eventEmitter);
+    this.footnoteManager = new FootnoteManager(this.eventEmitter);
+    this.annotationManager = new AnnotationManager(this.eventEmitter);
+    this.virtualScrollRenderer = new VirtualScrollRenderer(this.eventEmitter);
 
     // 构建 UI
     this.buildUI();
@@ -454,6 +508,19 @@ export class WordViewer {
         this.searchManager.setDocument(this.document, this.contentElement);
         this.tocManager.setDocument(this.document, this.contentElement);
         this.printManager.setDocument(this.document, this.contentElement);
+        this.exportManager.setDocument(this.document, this.contentElement);
+        this.thumbnailManager.setDocument(this.document, this.contentElement);
+        this.viewModeManager.setDocument(this.document, this.contentElement);
+        this.selectionManager.setDocument(this.document, this.contentElement);
+        this.bookmarkManager.setDocument(this.document, this.contentElement);
+        this.commentManager.setDocument(this.document, this.contentElement);
+        this.footnoteManager.setDocument(this.document, this.contentElement);
+        this.annotationManager.setDocument(this.document, this.contentElement);
+        
+        // 虚拟滚动
+        if (this.options.enableVirtualScroll) {
+          this.virtualScrollRenderer.initialize(this.contentElement);
+        }
       }
 
       // 渲染文档
@@ -756,6 +823,15 @@ export class WordViewer {
     this.searchManager.destroy();
     this.tocManager.destroy();
     this.printManager.destroy();
+    this.exportManager.destroy();
+    this.thumbnailManager.destroy();
+    this.viewModeManager.destroy();
+    this.selectionManager.destroy();
+    this.bookmarkManager.destroy();
+    this.commentManager.destroy();
+    this.footnoteManager.destroy();
+    this.annotationManager.destroy();
+    this.virtualScrollRenderer.destroy();
     this.renderer.destroy();
     this.eventEmitter.removeAllListeners();
 
@@ -769,5 +845,161 @@ export class WordViewer {
     this.sidebarElement = null;
     this.contentElement = null;
     this.statusBarElement = null;
+  }
+
+  // ==================== 新增功能方法 ====================
+
+  /**
+   * 导出为 PDF
+   */
+  async exportToPdf(filename?: string): Promise<void> {
+    await this.exportManager.exportToPdf({ filename });
+  }
+
+  /**
+   * 导出为图片
+   */
+  async exportToImage(format: 'png' | 'jpeg' | 'webp' = 'png'): Promise<string[]> {
+    return await this.exportManager.exportToImage({ format });
+  }
+
+  /**
+   * 导出为 HTML
+   */
+  async exportToHtml(): Promise<string> {
+    return await this.exportManager.exportToHtml();
+  }
+
+  /**
+   * 导出为纯文本
+   */
+  async exportToText(): Promise<string> {
+    return await this.exportManager.exportToText();
+  }
+
+  /**
+   * 设置视图模式
+   */
+  setViewMode(mode: ViewMode): void {
+    this.viewModeManager.setMode(mode);
+  }
+
+  /**
+   * 获取视图模式
+   */
+  getViewMode(): ViewMode {
+    return this.viewModeManager.getMode();
+  }
+
+  /**
+   * 切换全屏
+   */
+  toggleFullscreen(): void {
+    this.viewModeManager.toggleFullscreen();
+  }
+
+  /**
+   * 进入演示模式
+   */
+  enterPresentationMode(): void {
+    this.viewModeManager.setMode('presentation');
+  }
+
+  /**
+   * 显示缩略图面板
+   */
+  showThumbnails(container: HTMLElement): HTMLElement {
+    return this.thumbnailManager.renderPanel(container);
+  }
+
+  /**
+   * 获取书签
+   */
+  getBookmarks(): BookmarkItem[] {
+    return this.bookmarkManager.getAllBookmarks();
+  }
+
+  /**
+   * 添加书签
+   */
+  addBookmark(name: string): BookmarkItem | null {
+    return this.bookmarkManager.addBookmarkAtCurrentPosition(name);
+  }
+
+  /**
+   * 导航到书签
+   */
+  navigateToBookmark(id: string): void {
+    this.bookmarkManager.navigateToBookmark(id);
+  }
+
+  /**
+   * 显示书签面板
+   */
+  showBookmarks(container: HTMLElement): HTMLElement {
+    return this.bookmarkManager.renderPanel(container);
+  }
+
+  /**
+   * 显示批注面板
+   */
+  showComments(container: HTMLElement): HTMLElement {
+    return this.commentManager.renderPanel(container);
+  }
+
+  /**
+   * 显示脚注面板
+   */
+  showFootnotes(container: HTMLElement): HTMLElement {
+    return this.footnoteManager.renderPanel(container);
+  }
+
+  /**
+   * 获取标注
+   */
+  getAnnotations(): AnnotationItem[] {
+    return this.annotationManager.getAllAnnotations();
+  }
+
+  /**
+   * 显示标注面板
+   */
+  showAnnotations(container: HTMLElement): HTMLElement {
+    return this.annotationManager.renderPanel(container);
+  }
+
+  /**
+   * 导出标注
+   */
+  exportAnnotations(): string {
+    return this.annotationManager.exportAnnotations();
+  }
+
+  /**
+   * 导入标注
+   */
+  importAnnotations(json: string): void {
+    this.annotationManager.importAnnotations(json);
+  }
+
+  /**
+   * 切换虚拟滚动
+   */
+  setVirtualScrollEnabled(enabled: boolean): void {
+    this.virtualScrollRenderer.setEnabled(enabled);
+  }
+
+  /**
+   * 获取选中文本
+   */
+  getSelectedText(): string | null {
+    return this.selectionManager.getSelectedText();
+  }
+
+  /**
+   * 复制选中内容
+   */
+  copySelection(): void {
+    this.selectionManager.copyToClipboard();
   }
 }

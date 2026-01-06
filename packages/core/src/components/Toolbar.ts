@@ -97,11 +97,12 @@ export class Toolbar {
       display: 'flex',
       alignItems: 'center',
       gap: '4px',
-      padding: '8px 12px',
-      backgroundColor: '#ffffff',
-      borderBottom: '1px solid #e5e7eb',
+      padding: '8px 16px',
+      backgroundColor: 'var(--bg-card, #ffffff)',
+      borderBottom: '1px solid var(--border-color, #e5e7eb)',
       flexShrink: '0',
-      height: '48px'
+      height: '52px',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
     });
 
     // 缩放控制
@@ -217,12 +218,19 @@ export class Toolbar {
     this.zoomLabel.className = `${this.classPrefix}-zoom-label`;
     this.zoomLabel.textContent = `${this.currentScale}%`;
     Object.assign(this.zoomLabel.style, {
-      minWidth: '50px',
+      minWidth: '56px',
+      height: '32px',
+      lineHeight: '32px',
       textAlign: 'center',
       fontSize: '13px',
-      color: '#374151',
+      fontWeight: '500',
+      color: 'var(--text-secondary, #374151)',
+      background: 'var(--bg-primary, #ffffff)',
+      border: '1px solid var(--border-color, #e5e7eb)',
+      borderRadius: '6px',
       userSelect: 'none',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      transition: 'all 0.15s ease'
     });
     this.zoomLabel.title = '点击重置为 100%';
     this.zoomLabel.addEventListener('click', () => {
@@ -252,13 +260,17 @@ export class Toolbar {
     this.pageInput.value = '1';
     this.pageInput.className = `${this.classPrefix}-page-input`;
     Object.assign(this.pageInput.style, {
-      width: '40px',
-      height: '28px',
+      width: '44px',
+      height: '32px',
       textAlign: 'center',
-      border: '1px solid #e5e7eb',
-      borderRadius: '4px',
+      border: '1px solid var(--border-color, #e5e7eb)',
+      borderRadius: '6px',
       fontSize: '13px',
-      outline: 'none'
+      fontWeight: '500',
+      color: 'var(--text-primary, #111827)',
+      background: 'var(--bg-primary, #ffffff)',
+      outline: 'none',
+      transition: 'all 0.15s ease'
     });
     this.pageInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -276,13 +288,13 @@ export class Toolbar {
     // 总页数
     const slash = document.createElement('span');
     slash.textContent = ' / ';
-    slash.style.color = '#6b7280';
+    slash.style.color = 'var(--text-muted, #6b7280)';
     slash.style.fontSize = '13px';
     parent.appendChild(slash);
 
     this.totalPagesLabel = document.createElement('span');
     this.totalPagesLabel.textContent = '1';
-    this.totalPagesLabel.style.color = '#374151';
+    this.totalPagesLabel.style.color = 'var(--text-secondary, #374151)';
     this.totalPagesLabel.style.fontSize = '13px';
     parent.appendChild(this.totalPagesLabel);
 
@@ -310,24 +322,24 @@ export class Toolbar {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      width: '32px',
-      height: '32px',
+      width: '36px',
+      height: '36px',
       border: 'none',
-      borderRadius: '6px',
+      borderRadius: '8px',
       backgroundColor: 'transparent',
       cursor: 'pointer',
-      color: '#6b7280',
-      transition: 'all 0.15s'
+      color: 'var(--text-tertiary, #6b7280)',
+      transition: 'all 0.15s ease'
     });
 
     btn.addEventListener('mouseenter', () => {
-      btn.style.backgroundColor = '#f3f4f6';
-      btn.style.color = '#111827';
+      btn.style.backgroundColor = 'var(--bg-tertiary, #f3f4f6)';
+      btn.style.color = 'var(--text-primary, #111827)';
     });
 
     btn.addEventListener('mouseleave', () => {
       btn.style.backgroundColor = 'transparent';
-      btn.style.color = '#6b7280';
+      btn.style.color = 'var(--text-tertiary, #6b7280)';
     });
 
     btn.addEventListener('click', onClick);
@@ -343,9 +355,9 @@ export class Toolbar {
     const sep = document.createElement('div');
     Object.assign(sep.style, {
       width: '1px',
-      height: '20px',
-      backgroundColor: '#e5e7eb',
-      margin: '0 8px'
+      height: '24px',
+      backgroundColor: 'var(--border-color, #e5e7eb)',
+      margin: '0 12px'
     });
     parent.appendChild(sep);
   }

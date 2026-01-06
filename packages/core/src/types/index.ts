@@ -850,9 +850,213 @@ export interface PrintOptions {
 
 /** 导出选项 */
 export interface ExportOptions {
+  /** 导出格式 */
   format: 'pdf' | 'html' | 'image' | 'text';
+  /** 图片质量 (0-1) */
   quality?: number;
+  /** 缩放比例 */
   scale?: number;
+  /** 页面范围 */
   pageRange?: string;
+  /** 包含元数据 */
   includeMetadata?: boolean;
+  /** 图片格式 */
+  imageFormat?: 'png' | 'jpeg' | 'webp';
+  /** 文件名 */
+  fileName?: string;
+}
+
+// ============ 视图模式 ============
+
+/** 视图模式 */
+export type ViewMode = 'single' | 'double' | 'continuous' | 'presentation';
+
+/** 视图模式配置 */
+export interface ViewModeConfig {
+  /** 当前模式 */
+  mode: ViewMode;
+  /** 是否全屏 */
+  fullscreen?: boolean;
+  /** 页面间距 */
+  pageGap?: number;
+  /** 是否显示页面阴影 */
+  showPageShadow?: boolean;
+}
+
+// ============ 缩略图 ============
+
+/** 缩略图配置 */
+export interface ThumbnailConfig {
+  /** 缩略图宽度 */
+  width?: number;
+  /** 缩略图质量 */
+  quality?: number;
+  /** 是否显示页码 */
+  showPageNumber?: boolean;
+  /** 懒加载 */
+  lazyLoad?: boolean;
+}
+
+/** 缩略图项 */
+export interface ThumbnailItem {
+  /** 页码 */
+  pageIndex: number;
+  /** 缩略图URL */
+  imageUrl?: string;
+  /** 是否已生成 */
+  generated: boolean;
+}
+
+// ============ 书签 ============
+
+/** 书签项 */
+export interface BookmarkItem {
+  /** 书签ID */
+  id: string;
+  /** 书签名称 */
+  name: string;
+  /** 目标锚点 */
+  anchor?: string;
+  /** 页码 */
+  pageIndex?: number;
+  /** 是否为用户创建 */
+  isUserCreated?: boolean;
+  /** 创建时间 */
+  createdAt?: Date;
+}
+
+// ============ 批注增强 ============
+
+/** 批注显示配置 */
+export interface CommentDisplayConfig {
+  /** 是否显示批注 */
+  visible: boolean;
+  /** 显示模式 */
+  displayMode: 'sidebar' | 'inline' | 'tooltip';
+  /** 是否显示已解决的批注 */
+  showResolved?: boolean;
+}
+
+// ============ 标注/高亮 ============
+
+/** 标注类型 */
+export type AnnotationType = 'highlight' | 'underline' | 'strikethrough' | 'note';
+
+/** 标注项 */
+export interface AnnotationItem {
+  /** 标注ID */
+  id: string;
+  /** 标注类型 */
+  type: AnnotationType;
+  /** 颜色 */
+  color: string;
+  /** 文本内容 */
+  text: string;
+  /** 备注 */
+  note?: string;
+  /** 页码 */
+  pageIndex: number;
+  /** 开始偏移 */
+  startOffset: number;
+  /** 结束偏移 */
+  endOffset: number;
+  /** 创建时间 */
+  createdAt: Date;
+  /** 修改时间 */
+  updatedAt?: Date;
+}
+
+/** 标注存储 */
+export interface AnnotationStore {
+  /** 文档ID */
+  documentId: string;
+  /** 标注列表 */
+  annotations: AnnotationItem[];
+}
+
+// ============ 选择 ============
+
+/** 选择信息 */
+export interface SelectionInfo {
+  /** 选中的文本 */
+  text: string;
+  /** 选区范围 */
+  range: Range | null;
+  /** 起始页 */
+  startPage?: number;
+  /** 结束页 */
+  endPage?: number;
+  /** 边界矩形 */
+  boundingRect?: DOMRect;
+}
+
+// ============ 右键菜单 ============
+
+/** 右键菜单项 */
+export interface ContextMenuItem {
+  /** 唯一标识 */
+  id: string;
+  /** 显示文本 */
+  label: string;
+  /** 图标 */
+  icon?: string;
+  /** 快捷键 */
+  shortcut?: string;
+  /** 是否禁用 */
+  disabled?: boolean;
+  /** 是否为分隔符 */
+  separator?: boolean;
+  /** 子菜单 */
+  children?: ContextMenuItem[];
+  /** 点击处理函数 */
+  onClick?: () => void;
+}
+
+// ============ 更多事件类型 ============
+
+/** 扩展事件类型 */
+export type ExtendedEventType =
+  | EventType
+  | 'export'
+  | 'exportError'
+  | 'viewModeChange'
+  | 'thumbnailGenerate'
+  | 'bookmarkClick'
+  | 'commentClick'
+  | 'annotationChange'
+  | 'contextMenu'
+  | 'fullscreenChange';
+
+/** 导出事件 */
+export interface ExportEvent extends EventData {
+  type: 'export';
+  format: ExportOptions['format'];
+  success: boolean;
+  blob?: Blob;
+}
+
+/** 视图模式变化事件 */
+export interface ViewModeChangeEvent extends EventData {
+  type: 'viewModeChange';
+  mode: ViewMode;
+  previousMode: ViewMode;
+}
+
+/** 批注点击事件 */
+export interface CommentClickEvent extends EventData {
+  type: 'commentClick';
+  comment: CommentElement;
+}
+
+/** 标注变化事件 */
+export interface AnnotationChangeEvent extends EventData {
+  type: 'annotationChange';
+  action: 'add' | 'remove' | 'update';
+  annotation: AnnotationItem;
+}
+
+/** 全屏变化事件 */
+export interface FullscreenChangeEvent extends EventData {
+  type: 'fullscreenChange';
+  isFullscreen: boolean;
 }

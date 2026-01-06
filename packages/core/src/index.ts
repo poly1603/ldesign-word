@@ -103,7 +103,20 @@ export type {
   PrintOptions,
 
   // 导出
-  ExportOptions
+  ExportOptions,
+
+  // 新增类型
+  ViewMode,
+  ViewModeConfig,
+  ThumbnailConfig,
+  ThumbnailItem,
+  BookmarkItem,
+  CommentDisplayConfig,
+  AnnotationType,
+  AnnotationItem,
+  AnnotationStore,
+  SelectionInfo,
+  ContextMenuItem
 } from './types';
 
 // 常量导出
@@ -122,6 +135,15 @@ export { EventEmitter } from './events/EventEmitter';
 export { SearchManager, type SearchOptions } from './features/SearchManager';
 export { TocManager } from './features/TocManager';
 export { PrintManager } from './features/PrintManager';
+export { ExportManager } from './features/ExportManager';
+export { ThumbnailManager } from './features/ThumbnailManager';
+export { ViewModeManager } from './features/ViewModeManager';
+export { SelectionManager } from './features/SelectionManager';
+export { BookmarkManager } from './features/BookmarkManager';
+export { CommentManager } from './features/CommentManager';
+export { FootnoteManager } from './features/FootnoteManager';
+export { AnnotationManager } from './features/AnnotationManager';
+export { VirtualScrollRenderer } from './features/VirtualScrollRenderer';
 
 // 工具类导出
 export { XmlUtils } from './utils/XmlUtils';
